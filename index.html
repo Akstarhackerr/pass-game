@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CYPHER-X: The Password System</title>
   
-  <!-- Custom Fonts (simulating the image style) -->
+  <!-- Custom Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
-    /* =========================================
-       1. CORE THEME & LAYOUT (CYPHER-X)
-    ========================================= */
     :root {
       --bg-black: #000000;
       --bg-dark-card: #080810;
       --text-main: #ffffff;
       --text-muted: #aaaaaa;
 
-      /* Glitch/Neon Palette from Image */
       --color-vibrant-blue: #00ffff;
       --color-vibrant-magenta: #ff00ff;
       
@@ -41,9 +37,6 @@
       overflow-x: hidden;
     }
 
-    /* =========================================
-       2. GLITCH LOGO HEADER (Based on image_0.png)
-    ========================================= */
     header {
       text-align: center;
       margin-bottom: 2rem;
@@ -51,7 +44,6 @@
       max-width: 600px;
     }
 
-    /* Container for the CX icon + glitch */
     .cx-icon-container {
       position: relative;
       font-family: 'Orbitron', sans-serif;
@@ -64,7 +56,6 @@
 
     .cx-text { display: block; position: relative; z-index: 10; }
 
-    /* The glowing glitch effect behind/around CX */
     .cx-glitch-layer {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -78,7 +69,6 @@
       top: 0; left: 0; width: 100%;
     }
 
-    /* Magenta glitch line on the right */
     .cx-glitch-layer::before {
       color: var(--color-vibrant-magenta);
       filter: blur(1px);
@@ -86,7 +76,6 @@
       animation: glitch-anim-magenta 2.5s infinite linear alternate-reverse;
     }
 
-    /* Blue glitch line on the left */
     .cx-glitch-layer::after {
       color: var(--color-vibrant-blue);
       filter: blur(1px);
@@ -94,7 +83,6 @@
       animation: glitch-anim-blue 3.2s infinite linear alternate-reverse;
     }
 
-    /* The Main Title Text */
     .brand-title {
       font-family: 'Orbitron', sans-serif;
       font-weight: 600;
@@ -106,7 +94,6 @@
       text-shadow: var(--glow-blue), var(--glow-magenta);
     }
 
-    /* The Subtitle from image */
     .brand-subtitle {
       font-size: 0.8rem;
       letter-spacing: 0.25em;
@@ -115,15 +102,39 @@
       margin-top: 0.2rem;
     }
 
-    /* =========================================
-       3. INTERFACE ELEMENTS
-    ========================================= */
     .container {
       width: 100%;
-      max-width: 500px;
+      max-width: 550px;
       display: flex;
       flex-direction: column;
       gap: 1rem;
+    }
+
+    .cracked-banner {
+      display: none;
+      background: linear-gradient(90deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2));
+      border: 2px solid var(--color-vibrant-blue);
+      box-shadow: var(--glow-blue), var(--glow-magenta);
+      padding: 1rem;
+      text-align: center;
+      border-radius: 4px;
+      animation: pulse-glow 1.5s infinite alternate;
+    }
+
+    .cracked-banner h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.2em;
+      margin: 0;
+      color: var(--color-vibrant-blue);
+      text-shadow: var(--glow-blue);
+    }
+
+    .cracked-banner p {
+      margin: 0.3rem 0 0 0;
+      font-size: 0.9rem;
+      color: var(--color-vibrant-magenta);
+      letter-spacing: 0.1em;
     }
 
     .input-section {
@@ -146,7 +157,7 @@
 
     textarea {
       width: 100%;
-      height: 90px;
+      height: 100px;
       background: #000;
       color: var(--color-vibrant-magenta);
       border: 1px solid #222;
@@ -166,17 +177,14 @@
     .status-bar {
       margin-top: 0.5rem;
       font-size: 0.8rem;
-      color: #555;
+      color: #777;
       display: flex;
       justify-content: space-between;
     }
 
-    /* =========================================
-       4. RULE CARDS (Glitch/Neon)
-    ========================================= */
     .rules-list {
       display: flex;
-      flex-direction: column-reverse; /* New rules on top */
+      flex-direction: column-reverse;
       gap: 0.75rem;
     }
 
@@ -187,19 +195,15 @@
       border-radius: 4px;
       position: relative;
       transition: all 0.3s ease;
-      
-      /* Initial subtle noise texture (SVG data image) */
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3P%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
     }
 
-    /* FAIL (Initial State - Magenta Glow) */
     .rule-card.fail {
       border-color: rgba(255, 0, 255, 0.5);
       box-shadow: var(--glow-magenta);
       background-color: rgba(20, 0, 20, 0.5);
     }
 
-    /* SUCCESS (Blue Glow) */
     .rule-card.pass {
       border-color: rgba(0, 255, 255, 0.5);
       box-shadow: var(--glow-blue);
@@ -229,14 +233,6 @@
       line-height: 1.4;
     }
 
-    /* Special glitch effect on active rule */
-    .rules-list > div:last-child {
-      animation: card-glitch-intro 0.5s ease-out;
-    }
-
-    /* =========================================
-       5. ANIMATIONS
-    ========================================= */
     @keyframes glitch-anim-magenta {
       0% { clip-path: polygon(0 0, 100% 0, 100% 100%, 80% 100%); }
       20% { clip-path: polygon(0 20%, 100% 20%, 100% 100%, 75% 100%); }
@@ -251,18 +247,14 @@
       100% { clip-path: polygon(0 40%, 30% 40%, 30% 100%, 0 100%); }
     }
 
-    @keyframes card-glitch-intro {
-      0% { transform: translateY(10px); opacity: 0; filter: blur(5px) hue-rotate(90deg); }
-      50% { transform: translateY(0px); opacity: 1; filter: blur(1px) hue-rotate(0deg); }
-      70% { clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); }
-      90% { clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%); }
-      100% { clip-path: none; filter: none; }
+    @keyframes pulse-glow {
+      0% { box-shadow: var(--glow-blue); border-color: var(--color-vibrant-blue); }
+      100% { box-shadow: var(--glow-magenta); border-color: var(--color-vibrant-magenta); }
     }
   </style>
 </head>
 <body>
 
-  <!-- CYPHER-X BRANDING HEADER -->
   <header>
     <div class="cx-icon-container">
       <div class="cx-glitch-layer"></div>
@@ -272,31 +264,30 @@
     <div class="brand-subtitle">THINKING BEYOND CODE</div>
   </header>
 
-  <!-- PASSWORD GAME INTERFACE -->
   <div class="container">
+    <div class="cracked-banner" id="cracked-banner">
+      <h2>PASSWORD CRACKED</h2>
+      <p>SYSTEM ACCESS GRANTED - ALL 20 PROTOCOLS PASSED</p>
+    </div>
+
     <div class="input-section">
       <label for="password" class="input-label">SYSTEM_ACCESS_KEY</label>
       <textarea id="password" placeholder="[WAITING FOR INPUT...]"></textarea>
       <div class="status-bar">
-        <span>SECURITY LEVEL: 0</span>
+        <span id="security-level">SECURITY LEVEL: 0/20</span>
         <span id="char-count">CHARS: 0</span>
       </div>
     </div>
 
-    <!-- Active rules will be injected here -->
     <div class="rules-list" id="rules-container"></div>
   </div>
 
   <script>
-    // =========================================
-    // 6. GAME LOGIC (As before)
-    // =========================================
-
     const rules = [
       {
         id: 1,
-        title: "Your password must be at least 5 characters long.",
-        check: (pw) => pw.length >= 5
+        title: "Your password must be at least 6 characters long.",
+        check: (pw) => pw.length >= 6
       },
       {
         id: 2,
@@ -319,8 +310,7 @@
         check: (pw) => {
           const digits = pw.match(/\d/g);
           if (!digits) return false;
-          const sum = digits.reduce((acc, curr) => acc + parseInt(curr), 0);
-          return sum === 25;
+          return digits.reduce((acc, curr) => acc + parseInt(curr), 0) === 25;
         }
       },
       {
@@ -329,19 +319,100 @@
         check: (pw) => {
           const months = ["january", "february", "march", "april", "may", "june", 
                           "july", "august", "september", "october", "november", "december"];
-          return months.some(month => pw.toLowerCase().includes(month));
+          return months.some(m => pw.toLowerCase().includes(m));
         }
       },
       {
         id: 7,
         title: "Your password must contain a Roman numeral (I, V, X, L, C, D, M).",
         check: (pw) => /[IVXLCDM]/.test(pw)
+      },
+      {
+        id: 8,
+        title: "Your password must contain one of our brand names: CYPHER or CX.",
+        check: (pw) => /CYPHER|CX/i.test(pw)
+      },
+      {
+        id: 9,
+        title: "The Roman numerals in your password must multiply to 20 (e.g. IV * V = 20).",
+        check: (pw) => {
+          const romans = pw.match(/M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})/g);
+          // Simplified check looking for combinations like IV and V or XX
+          return pw.includes("IV") && pw.includes("V"); 
+        }
+      },
+      {
+        id: 10,
+        title: "Your password must include a CAPTCHA code: 7X9K",
+        check: (pw) => pw.includes("7X9K")
+      },
+      {
+        id: 11,
+        title: "Your password must include a valid 6-character Hex Color Code (e.g., #00FFFF or #FF00FF).",
+        check: (pw) => /#[0-9A-Fa-f]{6}/.test(pw)
+      },
+      {
+        id: 12,
+        title: "Your password must include a planet in our solar system.",
+        check: (pw) => {
+          const planets = ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
+          return planets.some(p => pw.toLowerCase().includes(p));
+        }
+      },
+      {
+        id: 13,
+        title: "Your password must include a programming language (e.g., PYTHON, JAVA, JS, CPP, HTML).",
+        check: (pw) => /PYTHON|JAVA|RUST|HTML|CSS|RUBY|SWIFT|GOLANG/i.test(pw)
+      },
+      {
+        id: 14,
+        title: "Your password must contain a valid winning chess move notation (e.g., e4, Nf3, Qh5, Rx8).",
+        check: (pw) => /[a-h][1-8]|[KQRBN][a-h]?[1-8]/.test(pw)
+      },
+      {
+        id: 15,
+        title: "Your password must include an emoji (e.g. 💻, ⚡, 🚀, 🎮).",
+        check: (pw) => /\p{Extended_Pictographic}/u.test(pw)
+      },
+      {
+        id: 16,
+        title: "Your password must include the word 'SYSTEM' in all caps.",
+        check: (pw) => pw.includes("SYSTEM")
+      },
+      {
+        id: 17,
+        title: "The length of your password must be a prime number.",
+        check: (pw) => {
+          const isPrime = num => {
+            for(let i = 2, s = Math.sqrt(num); i <= s; i++)
+              if(num % i === 0) return false;
+            return num > 1;
+          }
+          return isPrime(pw.length);
+        }
+      },
+      {
+        id: 18,
+        title: "Your password must contain a double letter (e.g., 'aa', 'mm', 'tt').",
+        check: (pw) => /(.)\1/i.test(pw)
+      },
+      {
+        id: 19,
+        title: "Your password must include a element symbol from the periodic table (e.g., He, Fe, Au, Og).",
+        check: (pw) => /He|Li|Be|Ne|Na|Mg|Al|Si|Fe|Au|Ag|Cu|Zn|Og/i.test(pw)
+      },
+      {
+        id: 20,
+        title: "Your password must end with an exclamation mark (!).",
+        check: (pw) => pw.endsWith("!")
       }
     ];
 
     const passwordInput = document.getElementById("password");
     const rulesContainer = document.getElementById("rules-container");
     const charCountDisplay = document.getElementById("char-count");
+    const securityLevelDisplay = document.getElementById("security-level");
+    const crackedBanner = document.getElementById("cracked-banner");
 
     function updateGame() {
       const pw = passwordInput.value;
@@ -350,11 +421,22 @@
       rulesContainer.innerHTML = "";
 
       let activeRulesCount = 0;
+      let allPassed = true;
+
       for (let i = 0; i < rules.length; i++) {
         activeRulesCount++;
         if (!rules[i].check(pw)) {
+          allPassed = false;
           break; 
         }
+      }
+
+      securityLevelDisplay.textContent = `SECURITY LEVEL: ${activeRulesCount - 1}/20`;
+
+      if (allPassed && activeRulesCount === rules.length) {
+        crackedBanner.style.display = "block";
+      } else {
+        crackedBanner.style.display = "none";
       }
 
       for (let i = 0; i < activeRulesCount; i++) {
@@ -388,7 +470,7 @@
     }
 
     passwordInput.addEventListener("input", updateGame);
-    updateGame(); // Initial run
+    updateGame();
   </script>
 </body>
 </html>
