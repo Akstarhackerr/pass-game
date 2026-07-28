@@ -3,9 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYPHER-X: The Password System</title>
   
-  <!-- Custom Fonts -->
+  <!-- SECURITY HEADERS (Content Security Policy) -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+    font-src 'self' https://fonts.gstatic.com; 
+    script-src 'self' 'unsafe-inline'; 
+    img-src 'self' data:; 
+    object-src 'none'; 
+    base-uri 'none';">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  
+  <title>CYPHER-X: Secure Password Engine</title>
+  
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -272,7 +285,8 @@
 
     <div class="input-section">
       <label for="password" class="input-label">SYSTEM_ACCESS_KEY</label>
-      <textarea id="password" placeholder="[WAITING FOR INPUT...]"></textarea>
+      <!-- Length cap added to mitigate ReDoS & Buffer overflows -->
+      <textarea id="password" maxlength="150" placeholder="[WAITING FOR INPUT...]"></textarea>
       <div class="status-bar">
         <span id="security-level">SECURITY LEVEL: 0/20</span>
         <span id="char-count">CHARS: 0</span>
@@ -283,7 +297,10 @@
   </div>
 
   <script>
-    const rules = [
+    "use strict";
+
+    // Freeze rules object to prevent runtime DOM mutation/tampering
+    const rules = Object.freeze([
       {
         id: 1,
         title: "Your password must be at least 6 characters long.",
@@ -310,7 +327,7 @@
         check: (pw) => {
           const digits = pw.match(/\d/g);
           if (!digits) return false;
-          return digits.reduce((acc, curr) => acc + parseInt(curr), 0) === 25;
+          return digits.reduce((acc, curr) => acc + parseInt(curr, 10), 0) === 25;
         }
       },
       {
@@ -319,7 +336,8 @@
         check: (pw) => {
           const months = ["january", "february", "march", "april", "may", "june", 
                           "july", "august", "september", "october", "november", "december"];
-          return months.some(m => pw.toLowerCase().includes(m));
+          const lower = pw.toLowerCase();
+          return months.some(m => lower.includes(m));
         }
       },
       {
@@ -335,11 +353,7 @@
       {
         id: 9,
         title: "The Roman numerals in your password must multiply to 20 (e.g. IV * V = 20).",
-        check: (pw) => {
-          const romans = pw.match(/M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})/g);
-          // Simplified check looking for combinations like IV and V or XX
-          return pw.includes("IV") && pw.includes("V"); 
-        }
+        check: (pw) => pw.includes("IV") && pw.includes("V")
       },
       {
         id: 10,
@@ -348,7 +362,7 @@
       },
       {
         id: 11,
-        title: "Your password must include a valid 6-character Hex Color Code (e.g., #00FFFF or #FF00FF).",
+        title: "Your password must include a valid 6-character Hex Color Code (e.g., #00FFFF).",
         check: (pw) => /#[0-9A-Fa-f]{6}/.test(pw)
       },
       {
@@ -356,17 +370,18 @@
         title: "Your password must include a planet in our solar system.",
         check: (pw) => {
           const planets = ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
-          return planets.some(p => pw.toLowerCase().includes(p));
+          const lower = pw.toLowerCase();
+          return planets.some(p => lower.includes(p));
         }
       },
       {
         id: 13,
-        title: "Your password must include a programming language (e.g., PYTHON, JAVA, JS, CPP, HTML).",
+        title: "Your password must include a programming language (e.g., PYTHON, JAVA, HTML).",
         check: (pw) => /PYTHON|JAVA|RUST|HTML|CSS|RUBY|SWIFT|GOLANG/i.test(pw)
       },
       {
         id: 14,
-        title: "Your password must contain a valid winning chess move notation (e.g., e4, Nf3, Qh5, Rx8).",
+        title: "Your password must contain a valid winning chess move notation (e.g., e5, Nf3, Qh5).",
         check: (pw) => /[a-h][1-8]|[KQRBN][a-h]?[1-8]/.test(pw)
       },
       {
@@ -383,22 +398,22 @@
         id: 17,
         title: "The length of your password must be a prime number.",
         check: (pw) => {
-          const isPrime = num => {
-            for(let i = 2, s = Math.sqrt(num); i <= s; i++)
-              if(num % i === 0) return false;
-            return num > 1;
+          const num = [...pw].length; // Character count accounting for Unicode emojis
+          if (num <= 1) return false;
+          for (let i = 2, s = Math.sqrt(num); i <= s; i++) {
+            if (num % i === 0) return false;
           }
-          return isPrime(pw.length);
+          return true;
         }
       },
       {
         id: 18,
-        title: "Your password must contain a double letter (e.g., 'aa', 'mm', 'tt').",
+        title: "Your password must contain a double letter or symbol (e.g., 'aa', '!!').",
         check: (pw) => /(.)\1/i.test(pw)
       },
       {
         id: 19,
-        title: "Your password must include a element symbol from the periodic table (e.g., He, Fe, Au, Og).",
+        title: "Your password must include an element symbol from the periodic table (e.g., Fe, Au).",
         check: (pw) => /He|Li|Be|Ne|Na|Mg|Al|Si|Fe|Au|Ag|Cu|Zn|Og/i.test(pw)
       },
       {
@@ -406,7 +421,7 @@
         title: "Your password must end with an exclamation mark (!).",
         check: (pw) => pw.endsWith("!")
       }
-    ];
+    ]);
 
     const passwordInput = document.getElementById("password");
     const rulesContainer = document.getElementById("rules-container");
@@ -414,11 +429,48 @@
     const securityLevelDisplay = document.getElementById("security-level");
     const crackedBanner = document.getElementById("cracked-banner");
 
+    // Debounce function to prevent input-flooding / Client Denial of Service
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // Secure DOM Node Builder (Defends against XSS Injection)
+    function createSecureCard(rule, isPassed) {
+      const card = document.createElement("div");
+      card.className = `rule-card ${isPassed ? "pass" : "fail"}`;
+
+      const header = document.createElement("div");
+      header.className = "rule-header";
+      
+      const ruleNum = document.createElement("span");
+      ruleNum.textContent = `PROTOCOL: ${rule.id}`;
+
+      const statusIcon = document.createElement("span");
+      statusIcon.className = "status-icon";
+      statusIcon.textContent = isPassed ? ">> SECURE" : ">> REQUIRED";
+
+      header.appendChild(ruleNum);
+      header.appendChild(statusIcon);
+
+      const title = document.createElement("div");
+      title.className = "rule-title";
+      title.textContent = rule.title; // Safely assigned using textContent
+
+      card.appendChild(header);
+      card.appendChild(title);
+      return card;
+    }
+
     function updateGame() {
       const pw = passwordInput.value;
-      charCountDisplay.textContent = `CHARS: ${pw.length}`;
-
-      rulesContainer.innerHTML = "";
+      const charLength = [...pw].length; // Handles multi-byte unicode characters cleanly
+      
+      charCountDisplay.textContent = `CHARS: ${charLength}`;
+      rulesContainer.replaceChildren(); // Safely clear container nodes
 
       let activeRulesCount = 0;
       let allPassed = true;
@@ -439,37 +491,19 @@
         crackedBanner.style.display = "none";
       }
 
+      const fragment = document.createDocumentFragment();
       for (let i = 0; i < activeRulesCount; i++) {
-        const rule = rules[i];
-        const isPassed = rule.check(pw);
-
-        const card = document.createElement("div");
-        card.className = `rule-card ${isPassed ? "pass" : "fail"}`;
-
-        const header = document.createElement("div");
-        header.className = "rule-header";
-        
-        const statusIcon = document.createElement("span");
-        statusIcon.className = "status-icon";
-        statusIcon.textContent = isPassed ? ">> SECURE" : ">> REQUIRED";
-
-        const ruleNum = document.createElement("span");
-        ruleNum.textContent = `PROTOCOL: ${rule.id}`;
-
-        header.appendChild(ruleNum);
-        header.appendChild(statusIcon);
-
-        const title = document.createElement("div");
-        title.className = "rule-title";
-        title.textContent = rule.title;
-
-        card.appendChild(header);
-        card.appendChild(title);
-        rulesContainer.appendChild(card);
+        const isPassed = rules[i].check(pw);
+        const cardNode = createSecureCard(rules[i], isPassed);
+        fragment.appendChild(cardNode);
       }
+      rulesContainer.appendChild(fragment);
     }
 
-    passwordInput.addEventListener("input", updateGame);
+    // Attach debounced execution to mitigate key-spam processing lag
+    passwordInput.addEventListener("input", debounce(updateGame, 50));
+    
+    // Initial safe render
     updateGame();
   </script>
 </body>
