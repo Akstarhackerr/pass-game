@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- Content Security Policy: Completely blocks dynamic evaluation & external script injection -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self'; 
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
@@ -57,29 +56,10 @@
     }
 
     .cx-logo-svg {
-      width: 110px;
-      height: 110px;
-      margin-bottom: 1rem;
-      filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6)) drop-shadow(0 0 12px rgba(255, 0, 255, 0.5));
-    }
-
-    .brand-title {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 1.8rem;
-      letter-spacing: 0.15em;
-      margin: 0;
-      color: var(--text-main);
-      text-shadow: var(--glow-blue), var(--glow-magenta);
-    }
-
-    .brand-subtitle {
-      font-size: 0.8rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-top: 0.2rem;
+      width: 280px;
+      height: auto;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 0 15px rgba(180, 0, 255, 0.4));
     }
 
     .container {
@@ -175,7 +155,6 @@
       border-radius: 4px;
       position: relative;
       transition: all 0.3s ease;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3P%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
     }
 
     .rule-card.fail {
@@ -222,43 +201,132 @@
 <body>
 
   <header>
-    <!-- Custom Cyberpunk Glitch CX Logo -->
-    <svg class="cx-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Vector recreation of the provided Cypher-X image -->
+    <svg class="cx-logo-svg" viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="cx-grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#00FFFF" />
-          <stop offset="100%" stop-color="#0088FF" />
+        <!-- Metallic Silver Gradient -->
+        <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="30%" stop-color="#cccccc" />
+          <stop offset="50%" stop-color="#888899" />
+          <stop offset="70%" stop-color="#dddddd" />
+          <stop offset="100%" stop-color="#555566" />
         </linearGradient>
-        <linearGradient id="cx-grad-magenta" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#FF00FF" />
-          <stop offset="100%" stop-color="#9900FF" />
+
+        <!-- Neon X Glow Gradient -->
+        <linearGradient id="xNeonGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#4b0082" />
+          <stop offset="40%" stop-color="#8a00e6" />
+          <stop offset="75%" stop-color="#d000ff" />
+          <stop offset="100%" stop-color="#00ffff" />
         </linearGradient>
+
+        <!-- Subtle Text Metallic Gradient -->
+        <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="70%" stop-color="#d8d8ff" />
+          <stop offset="100%" stop-color="#c800ff" />
+        </linearGradient>
+
+        <!-- Cyber Glow Filter -->
+        <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
 
-      <!-- Outer Cyber Shield Frame -->
-      <polygon points="50,5 92,25 92,75 50,95 8,75 8,25" fill="none" stroke="url(#cx-grad-blue)" stroke-width="2" opacity="0.4" />
-      <polygon points="50,10 87,28 87,72 50,90 13,72 13,28" fill="none" stroke="url(#cx-grad-magenta)" stroke-width="1.5" opacity="0.6" />
+      <!-- Glitch Pixel Specks Background (Magenta / Cyan) -->
+      <g opacity="0.8">
+        <rect x="80" y="80" width="12" height="2" fill="#00ffff" />
+        <rect x="65" y="105" width="25" height="3" fill="#ff00ff" />
+        <rect x="70" y="115" width="8" height="2" fill="#00ffff" />
+        <rect x="110" y="60" width="18" height="2" fill="#ffffff" />
+        <rect x="360" y="90" width="15" height="3" fill="#ff00ff" opacity="0.9"/>
+        <rect x="380" y="110" width="22" height="2" fill="#00ffff" />
+        <rect x="340" y="135" width="30" height="4" fill="#d000ff" />
+        <rect x="395" y="150" width="10" height="2" fill="#ffffff" />
+      </g>
 
-      <!-- Glitch Accent Offsets -->
-      <path d="M 22,35 L 38,35 C 32,35 30,65 38,65 L 22,65" fill="none" stroke="#FF00FF" stroke-width="4" stroke-linecap="square" opacity="0.7" transform="translate(-1, 1)" />
-      <path d="M 78,35 L 58,65 M 58,35 L 78,65" fill="none" stroke="#00FFFF" stroke-width="4" stroke-linecap="square" opacity="0.7" transform="translate(1, -1)" />
+      <!-- Metallic 'C' Shape -->
+      <path d="M 270,85 
+               L 180,85 
+               L 125,125 
+               L 125,175 
+               L 180,215 
+               L 250,215 
+               L 220,190 
+               L 180,190 
+               L 155,168 
+               L 155,132 
+               L 180,110 
+               L 250,110 
+               Z" 
+            fill="url(#metalGrad)" 
+            stroke="#111" 
+            stroke-width="1" />
 
-      <!-- Main CX Stylized Vector Elements -->
-      <!-- 'C' Shape -->
-      <path d="M 40,32 L 25,32 C 18,32 18,68 25,68 L 40,68" fill="none" stroke="url(#cx-grad-blue)" stroke-width="6" stroke-linecap="square" />
-      <line x1="40" y1="32" x2="45" y2="32" stroke="#00FFFF" stroke-width="6" />
+      <!-- Inner C Cutout Shadow Accent -->
+      <path d="M 155,132 L 180,110 L 250,110 L 235,125 L 180,125 L 165,138 Z" fill="#444455" opacity="0.6"/>
 
-      <!-- 'X' Shape -->
-      <path d="M 75,32 L 55,68 M 55,32 L 75,68" fill="none" stroke="url(#cx-grad-magenta)" stroke-width="6" stroke-linecap="square" />
+      <!-- Stylized Sharp 'X' Overlaid -->
+      <g filter="url(#neonGlow)">
+        <!-- Main diagonal (bottom-left sharp spike to top-right tip) -->
+        <path d="M 175,235 
+                 L 270,140 
+                 L 415,50 
+                 L 350,150 
+                 L 285,210 
+                 Z" 
+              fill="url(#xNeonGrad)" />
 
-      <!-- Core Glowing Node Details -->
-      <circle cx="50" cy="50" r="3" fill="#00FFFF" />
-      <line x1="8" y1="50" x2="18" y2="50" stroke="#00FFFF" stroke-width="2" />
-      <line x1="82" y1="50" x2="92" y2="50" stroke="#FF00FF" stroke-width="2" />
+        <!-- Crossing diagonal (top-left to bottom-right tip) -->
+        <path d="M 260,105 
+                 L 300,135 
+                 L 395,235 
+                 L 310,180 
+                 L 275,150 
+                 Z" 
+              fill="url(#xNeonGrad)" />
+
+        <!-- Sharp Cyan Highlight Line inside X -->
+        <polyline points="180,230 270,140 405,55" fill="none" stroke="#00ffff" stroke-width="2.5" />
+      </g>
+
+      <!-- Horizontal Glitch Cut-Lines across CX -->
+      <rect x="100" y="102" width="120" height="2" fill="#000000" />
+      <rect x="230" y="130" width="150" height="3" fill="#000000" />
+      <rect x="110" y="160" width="90" fill="#000000" height="2" />
+
+      <!-- CYPHER-X Main Text -->
+      <text x="250" y="270" 
+            font-family="'Orbitron', sans-serif" 
+            font-weight="900" 
+            font-size="38" 
+            fill="url(#textGrad)" 
+            text-anchor="middle" 
+            letter-spacing="6">CYPHER-X</text>
+
+      <!-- Subtitle Tagline with Side Glitch Brackets -->
+      <g opacity="0.9">
+        <text x="250" y="298" 
+              font-family="'Share Tech Mono', monospace" 
+              font-size="14" 
+              fill="#d080ff" 
+              text-anchor="middle" 
+              letter-spacing="4">THINKING BEYOND CODE.</text>
+        
+        <!-- Left Subtitle Glitch Line -->
+        <line x1="60" y1="293" x2="110" y2="293" stroke="#00ffff" stroke-width="2" />
+        <rect x="80" y="291" width="6" height="5" fill="#ff00ff" />
+        
+        <!-- Right Subtitle Glitch Line -->
+        <line x1="390" y1="293" x2="440" y2="293" stroke="#00ffff" stroke-width="2" />
+        <rect x="410" y="291" width="6" height="5" fill="#ff00ff" />
+      </g>
     </svg>
-
-    <div class="brand-title">CYPHER-X</div>
-    <div class="brand-subtitle">THINKING BEYOND CODE</div>
   </header>
 
   <div class="container">
@@ -282,7 +350,6 @@
   <script>
     "use strict";
 
-    // Static function checks without eval() or dynamic execution
     const rules = Object.freeze([
       {
         id: 1,
