@@ -1,9 +1,12 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- Content Security Policy: Completely blocks dynamic evaluation & external script injection -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self'; 
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
@@ -55,11 +58,62 @@
       max-width: 600px;
     }
 
-    .cx-logo-svg {
-      width: 280px;
-      height: auto;
-      margin-bottom: 0.5rem;
-      filter: drop-shadow(0 0 15px rgba(180, 0, 255, 0.4));
+    .cx-icon-container {
+      position: relative;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 5rem;
+      line-height: 1;
+      margin-bottom: 1rem;
+      color: white;
+    }
+
+    .cx-text { display: block; position: relative; z-index: 10; }
+
+    .cx-glitch-layer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .cx-glitch-layer::before, .cx-glitch-layer::after {
+      content: 'CX';
+      position: absolute;
+      top: 0; left: 0; width: 100%;
+    }
+
+    .cx-glitch-layer::before {
+      color: var(--color-vibrant-magenta);
+      filter: blur(1px);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 80% 100%);
+      animation: glitch-anim-magenta 2.5s infinite linear alternate-reverse;
+    }
+
+    .cx-glitch-layer::after {
+      color: var(--color-vibrant-blue);
+      filter: blur(1px);
+      clip-path: polygon(0 0, 20% 0, 20% 100%, 0 100%);
+      animation: glitch-anim-blue 3.2s infinite linear alternate-reverse;
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 1.8rem;
+      letter-spacing: 0.15em;
+      margin: 0;
+      color: var(--text-main);
+      text-shadow: var(--glow-blue), var(--glow-magenta);
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
     }
 
     .container {
@@ -155,6 +209,7 @@
       border-radius: 4px;
       position: relative;
       transition: all 0.3s ease;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3P%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
     }
 
     .rule-card.fail {
@@ -192,6 +247,20 @@
       line-height: 1.4;
     }
 
+    @keyframes glitch-anim-magenta {
+      0% { clip-path: polygon(0 0, 100% 0, 100% 100%, 80% 100%); }
+      20% { clip-path: polygon(0 20%, 100% 20%, 100% 100%, 75% 100%); }
+      60% { clip-path: polygon(0 0, 100% 0, 100% 80%, 90% 80%); }
+      100% { clip-path: polygon(0 50%, 100% 50%, 100% 100%, 85% 100%); }
+    }
+
+    @keyframes glitch-anim-blue {
+      0% { clip-path: polygon(0 0, 20% 0, 20% 100%, 0 100%); }
+      30% { clip-path: polygon(0 10%, 25% 10%, 25% 100%, 0 100%); }
+      70% { clip-path: polygon(0 0, 15% 0, 15% 90%, 0 90%); }
+      100% { clip-path: polygon(0 40%, 30% 40%, 30% 100%, 0 100%); }
+    }
+
     @keyframes pulse-glow {
       0% { box-shadow: var(--glow-blue); border-color: var(--color-vibrant-blue); }
       100% { box-shadow: var(--glow-magenta); border-color: var(--color-vibrant-magenta); }
@@ -201,132 +270,12 @@
 <body>
 
   <header>
-    <!-- Vector recreation of the provided Cypher-X image -->
-    <svg class="cx-logo-svg" viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Metallic Silver Gradient -->
-        <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ffffff" />
-          <stop offset="30%" stop-color="#cccccc" />
-          <stop offset="50%" stop-color="#888899" />
-          <stop offset="70%" stop-color="#dddddd" />
-          <stop offset="100%" stop-color="#555566" />
-        </linearGradient>
-
-        <!-- Neon X Glow Gradient -->
-        <linearGradient id="xNeonGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#4b0082" />
-          <stop offset="40%" stop-color="#8a00e6" />
-          <stop offset="75%" stop-color="#d000ff" />
-          <stop offset="100%" stop-color="#00ffff" />
-        </linearGradient>
-
-        <!-- Subtle Text Metallic Gradient -->
-        <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#ffffff" />
-          <stop offset="70%" stop-color="#d8d8ff" />
-          <stop offset="100%" stop-color="#c800ff" />
-        </linearGradient>
-
-        <!-- Cyber Glow Filter -->
-        <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      <!-- Glitch Pixel Specks Background (Magenta / Cyan) -->
-      <g opacity="0.8">
-        <rect x="80" y="80" width="12" height="2" fill="#00ffff" />
-        <rect x="65" y="105" width="25" height="3" fill="#ff00ff" />
-        <rect x="70" y="115" width="8" height="2" fill="#00ffff" />
-        <rect x="110" y="60" width="18" height="2" fill="#ffffff" />
-        <rect x="360" y="90" width="15" height="3" fill="#ff00ff" opacity="0.9"/>
-        <rect x="380" y="110" width="22" height="2" fill="#00ffff" />
-        <rect x="340" y="135" width="30" height="4" fill="#d000ff" />
-        <rect x="395" y="150" width="10" height="2" fill="#ffffff" />
-      </g>
-
-      <!-- Metallic 'C' Shape -->
-      <path d="M 270,85 
-               L 180,85 
-               L 125,125 
-               L 125,175 
-               L 180,215 
-               L 250,215 
-               L 220,190 
-               L 180,190 
-               L 155,168 
-               L 155,132 
-               L 180,110 
-               L 250,110 
-               Z" 
-            fill="url(#metalGrad)" 
-            stroke="#111" 
-            stroke-width="1" />
-
-      <!-- Inner C Cutout Shadow Accent -->
-      <path d="M 155,132 L 180,110 L 250,110 L 235,125 L 180,125 L 165,138 Z" fill="#444455" opacity="0.6"/>
-
-      <!-- Stylized Sharp 'X' Overlaid -->
-      <g filter="url(#neonGlow)">
-        <!-- Main diagonal (bottom-left sharp spike to top-right tip) -->
-        <path d="M 175,235 
-                 L 270,140 
-                 L 415,50 
-                 L 350,150 
-                 L 285,210 
-                 Z" 
-              fill="url(#xNeonGrad)" />
-
-        <!-- Crossing diagonal (top-left to bottom-right tip) -->
-        <path d="M 260,105 
-                 L 300,135 
-                 L 395,235 
-                 L 310,180 
-                 L 275,150 
-                 Z" 
-              fill="url(#xNeonGrad)" />
-
-        <!-- Sharp Cyan Highlight Line inside X -->
-        <polyline points="180,230 270,140 405,55" fill="none" stroke="#00ffff" stroke-width="2.5" />
-      </g>
-
-      <!-- Horizontal Glitch Cut-Lines across CX -->
-      <rect x="100" y="102" width="120" height="2" fill="#000000" />
-      <rect x="230" y="130" width="150" height="3" fill="#000000" />
-      <rect x="110" y="160" width="90" fill="#000000" height="2" />
-
-      <!-- CYPHER-X Main Text -->
-      <text x="250" y="270" 
-            font-family="'Orbitron', sans-serif" 
-            font-weight="900" 
-            font-size="38" 
-            fill="url(#textGrad)" 
-            text-anchor="middle" 
-            letter-spacing="6">CYPHER-X</text>
-
-      <!-- Subtitle Tagline with Side Glitch Brackets -->
-      <g opacity="0.9">
-        <text x="250" y="298" 
-              font-family="'Share Tech Mono', monospace" 
-              font-size="14" 
-              fill="#d080ff" 
-              text-anchor="middle" 
-              letter-spacing="4">THINKING BEYOND CODE.</text>
-        
-        <!-- Left Subtitle Glitch Line -->
-        <line x1="60" y1="293" x2="110" y2="293" stroke="#00ffff" stroke-width="2" />
-        <rect x="80" y="291" width="6" height="5" fill="#ff00ff" />
-        
-        <!-- Right Subtitle Glitch Line -->
-        <line x1="390" y1="293" x2="440" y2="293" stroke="#00ffff" stroke-width="2" />
-        <rect x="410" y="291" width="6" height="5" fill="#ff00ff" />
-      </g>
-    </svg>
+    <div class="cx-icon-container">
+      <div class="cx-glitch-layer"></div>
+      <div class="cx-text">CX</div>
+    </div>
+    <div class="brand-title">CYPHER-X</div>
+    <div class="brand-subtitle">THINKING BEYOND CODE</div>
   </header>
 
   <div class="container">
@@ -350,6 +299,7 @@
   <script>
     "use strict";
 
+    // Static function checks without eval() or dynamic execution
     const rules = Object.freeze([
       {
         id: 1,
