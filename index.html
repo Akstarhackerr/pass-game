@@ -590,7 +590,7 @@
       }
     });
 
-    // Auto-disappear if typing pauses for 1.2 seconds
+    // Auto-disappear if typing pauses for 3 minutes (180,000ms)
     nameInput.addEventListener('input', () => {
       if (isSubmitted) return;
       clearTimeout(typingTimer);
@@ -601,7 +601,7 @@
         
         typingTimer = setTimeout(() => {
           submitAndDisappear();
-        }, 1200); 
+        }, 180000); // 3 MINUTES WAITING TIME
       } else {
         modalStatus.textContent = "";
       }
