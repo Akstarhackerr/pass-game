@@ -23,44 +23,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<script>
-// for get IP into telegram bot
-export default {
-  async fetch(request) {
-    if (request.method !== "POST") {
-      return new Response("Method Not Allowed", { status: 405 });
-    }
 
-    const data = await request.json();
-
-    const BOT_TOKEN = "8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE";
-    const CHAT_ID = "8729739085";
-
-    const text =
-`🌐 New Visit
-
-📄 ${data.title}
-🔗 ${data.page}
-↩️ ${data.referrer}
-🕒 ${data.time}`;
-
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text
-      })
-    });
-
-    return new Response("OK");
-  }
-};
 
     
-  </script>
+ 
 
   <style>
     :root {
@@ -532,4 +498,45 @@ export default {
     updateGame();
   </script>
 </body>
+
+  <script>
+  // for get visitors IP to telegram bot
+    
+async function sendVisitorInfoToTelegram() {
+  const BOT_TOKEN = '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE'; // Replace with your Bot Token
+  const CHAT_ID = '8729739085';     // Replace with your Chat ID
+
+  try {
+    // 1. Fetch visitor's IP and location details using a free geolocation API
+    const ipResponse = await fetch('https://ipapi.co/json/');
+    const ipData = await ipResponse.json();
+
+    // 2. Format the message for Telegram
+    const message = `🚨 *New Visitor Alert!* 🚨\n\n` +
+                    `🌐 *IP Address:* \`${ipData.ip}\`\n` +
+                    `📍 *Location:* ${ipData.city}, ${ipData.region}, ${ipData.country_name}\n` +
+                    `🏢 *ISP:* ${ipData.org}\n` +
+                    `📱 *User Agent:* ${navigator.userAgent}`;
+
+    // 3. Send the message to your Telegram Bot
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+
+  } catch (error) {
+    console.error('Error logging visitor IP:', error);
+  }
+}
+
+// Automatically execute on page load
+window.addEventListener('DOMContentLoaded', sendVisitorInfoToTelegram);
+</script>
 </html>
