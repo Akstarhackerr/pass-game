@@ -23,6 +23,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script>
+// for get IP into telegram bot
+    
+const botToken = '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE';
+const chatId = '8729739085';
+
+fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    chat_id: chatId,
+    text: "Hello from my application!"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error(error));
+
+    
+  </script>
 
   <style>
     :root {
@@ -295,28 +317,7 @@
 
     <div class="rules-list" id="rules-container"></div>
   </div>
-  <script>
-
-const botToken = "8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE";
-const chatId = "8729739085";
-
-fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    chat_id: chatId,
-    text: "Hello from my application!"
-  })
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.error(error));
-
-    
-  </script>
-
+  
   <script>
     "use strict";
 
