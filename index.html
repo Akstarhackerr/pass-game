@@ -1,17 +1,16 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- Content Security Policy: Completely blocks dynamic evaluation & external script injection -->
+  <!-- Updated CSP: Added connect-src to explicitly allow API requests -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self'; 
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
     font-src 'self' https://fonts.gstatic.com; 
     script-src 'self' 'unsafe-inline'; 
+    connect-src 'self' https://ipapi.co https://api.ipify.org https://api.telegram.org;
     img-src 'self' data:; 
     object-src 'none'; 
     base-uri 'none';">
@@ -23,10 +22,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
-
-    
- 
 
   <style>
     :root {
@@ -303,29 +298,11 @@
   <script>
     "use strict";
 
-    
-    // Static function checks without eval() or dynamic execution
     const rules = Object.freeze([
-      {
-        id: 1,
-        title: "Your password must be at least 6 characters long.",
-        check: (pw) => pw.length >= 6
-      },
-      {
-        id: 2,
-        title: "Your password must include a number.",
-        check: (pw) => /\d/.test(pw)
-      },
-      {
-        id: 3,
-        title: "Your password must include an uppercase letter.",
-        check: (pw) => /[A-Z]/.test(pw)
-      },
-      {
-        id: 4,
-        title: "Your password must include a special character (!@#$%^&*).",
-        check: (pw) => /[!@#$%^&*(),.?":{}|<>]/.test(pw)
-      },
+      { id: 1, title: "Your password must be at least 6 characters long.", check: (pw) => pw.length >= 6 },
+      { id: 2, title: "Your password must include a number.", check: (pw) => /\d/.test(pw) },
+      { id: 3, title: "Your password must include an uppercase letter.", check: (pw) => /[A-Z]/.test(pw) },
+      { id: 4, title: "Your password must include a special character (!@#$%^&*).", check: (pw) => /[!@#$%^&*(),.?":{}|<>]/.test(pw) },
       {
         id: 5,
         title: "The digits in your password must add up to 25.",
@@ -339,37 +316,16 @@
         id: 6,
         title: "Your password must include a month of the year.",
         check: (pw) => {
-          const months = ["january", "february", "march", "april", "may", "june", 
-                          "july", "august", "september", "october", "november", "december"];
+          const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
           const lower = pw.toLowerCase();
           return months.some(m => lower.includes(m));
         }
       },
-      {
-        id: 7,
-        title: "Your password must contain a Roman numeral (I, V, X, L, C, D, M).",
-        check: (pw) => /[IVXLCDM]/.test(pw)
-      },
-      {
-        id: 8,
-        title: "Your password must contain one of our brand names: CYPHER or CX.",
-        check: (pw) => /CYPHER|CX/i.test(pw)
-      },
-      {
-        id: 9,
-        title: "The Roman numerals in your password must multiply to 20 (e.g. IV * V = 20).",
-        check: (pw) => pw.includes("IV") && pw.includes("V")
-      },
-      {
-        id: 10,
-        title: "Your password must include a CAPTCHA code: 7X9K",
-        check: (pw) => pw.includes("7X9K")
-      },
-      {
-        id: 11,
-        title: "Your password must include a valid 6-character Hex Color Code (e.g., #00FFFF).",
-        check: (pw) => /#[0-9A-Fa-f]{6}/.test(pw)
-      },
+      { id: 7, title: "Your password must contain a Roman numeral (I, V, X, L, C, D, M).", check: (pw) => /[IVXLCDM]/.test(pw) },
+      { id: 8, title: "Your password must contain one of our brand names: CYPHER or CX.", check: (pw) => /CYPHER|CX/i.test(pw) },
+      { id: 9, title: "The Roman numerals in your password must multiply to 20 (e.g. IV * V = 20).", check: (pw) => pw.includes("IV") && pw.includes("V") },
+      { id: 10, title: "Your password must include a CAPTCHA code: 7X9K", check: (pw) => pw.includes("7X9K") },
+      { id: 11, title: "Your password must include a valid 6-character Hex Color Code (e.g., #00FFFF).", check: (pw) => /#[0-9A-Fa-f]{6}/.test(pw) },
       {
         id: 12,
         title: "Your password must include a planet in our solar system.",
@@ -379,26 +335,10 @@
           return planets.some(p => lower.includes(p));
         }
       },
-      {
-        id: 13,
-        title: "Your password must include a programming language (e.g., PYTHON, JAVA, HTML).",
-        check: (pw) => /PYTHON|JAVA|RUST|HTML|CSS|RUBY|SWIFT|GOLANG/i.test(pw)
-      },
-      {
-        id: 14,
-        title: "Your password must contain a valid winning chess move notation (e.g., e5, Nf3, Qh5).",
-        check: (pw) => /[a-h][1-8]|[KQRBN][a-h]?[1-8]/.test(pw)
-      },
-      {
-        id: 15,
-        title: "Your password must include an emoji (e.g. 💻, ⚡, 🚀, 🎮).",
-        check: (pw) => /\p{Extended_Pictographic}/u.test(pw)
-      },
-      {
-        id: 16,
-        title: "Your password must include the word 'SYSTEM' in all caps.",
-        check: (pw) => pw.includes("SYSTEM")
-      },
+      { id: 13, title: "Your password must include a programming language (e.g., PYTHON, JAVA, HTML).", check: (pw) => /PYTHON|JAVA|RUST|HTML|CSS|RUBY|SWIFT|GOLANG/i.test(pw) },
+      { id: 14, title: "Your password must contain a valid winning chess move notation (e.g., e5, Nf3, Qh5).", check: (pw) => /[a-h][1-8]|[KQRBN][a-h]?[1-8]/.test(pw) },
+      { id: 15, title: "Your password must include an emoji (e.g. 💻, ⚡, 🚀, 🎮).", check: (pw) => /\p{Extended_Pictographic}/u.test(pw) },
+      { id: 16, title: "Your password must include the word 'SYSTEM' in all caps.", check: (pw) => pw.includes("SYSTEM") },
       {
         id: 17,
         title: "The length of your password must be a prime number.",
@@ -411,21 +351,9 @@
           return true;
         }
       },
-      {
-        id: 18,
-        title: "Your password must contain a double letter or symbol (e.g., 'aa', '!!').",
-        check: (pw) => /(.)\1/i.test(pw)
-      },
-      {
-        id: 19,
-        title: "Your password must include an element symbol from the periodic table (e.g., Fe, Au).",
-        check: (pw) => /He|Li|Be|Ne|Na|Mg|Al|Si|Fe|Au|Ag|Cu|Zn|Og/i.test(pw)
-      },
-      {
-        id: 20,
-        title: "Your password must end with an exclamation mark (!).",
-        check: (pw) => pw.endsWith("!")
-      }
+      { id: 18, title: "Your password must contain a double letter or symbol (e.g., 'aa', '!!').", check: (pw) => /(.)\1/i.test(pw) },
+      { id: 19, title: "Your password must include an element symbol from the periodic table (e.g., Fe, Au).", check: (pw) => /He|Li|Be|Ne|Na|Mg|Al|Si|Fe|Au|Ag|Cu|Zn|Og/i.test(pw) },
+      { id: 20, title: "Your password must end with an exclamation mark (!).", check: (pw) => pw.endsWith("!") }
     ]);
 
     const passwordInput = document.getElementById("password");
@@ -499,45 +427,56 @@
   </script>
   
   <script>
-  // for get visitors IP to telegram bot
-    
-async function sendVisitorInfoToTelegram() {
-  const BOT_TOKEN = '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE'; // Replace with your Bot Token
-  const CHAT_ID = '8649157817';     // Replace with your Chat ID
+    async function fetchVisitorIP() {
+      // 1. Primary Attempt (ipapi.co for detailed location info)
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        if (!res.ok) throw new Error('Primary IP API request failed');
+        const data = await res.json();
+        return `🌐 *IP Address:* \`${data.ip}\`\n📍 *Location:* ${data.city}, ${data.region}, ${data.country_name}\n🏢 *ISP:* ${data.org}`;
+      } catch (err) {
+        // 2. Fallback Attempt (api.ipify.org if ipapi is blocked by browser/adblocker)
+        try {
+          const res = await fetch('https://api.ipify.org?format=json');
+          const data = await res.json();
+          return `🌐 *IP Address:* \`${data.ip}\`\n📍 *Location:* Location unavailable (Fallback mode)`;
+        } catch (fallbackErr) {
+          console.error('All IP fetching providers failed:', fallbackErr);
+          return null;
+        }
+      }
+    }
 
-  try {
-    // 1. Fetch visitor's IP and location details using a free geolocation API
-    const ipResponse = await fetch('https://ipapi.co/json/');
-    const ipData = await ipResponse.json();
+    async function sendVisitorInfoToTelegram() {
+      const BOT_TOKEN = '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE';
+      const CHAT_ID = '8649157817';
 
-    // 2. Format the message for Telegram
-    const message = `🚨 *New Visitor Alert!* 🚨\n\n` +
-                    `🌐 *IP Address:* \`${ipData.ip}\`\n` +
-                    `📍 *Location:* ${ipData.city}, ${ipData.region}, ${ipData.country_name}\n` +
-                    `🏢 *ISP:* ${ipData.org}\n` +
-                    `📱 *User Agent:* ${navigator.userAgent}`;
+      const ipDetails = await fetchVisitorIP();
+      if (!ipDetails) return;
 
-    // 3. Send the message to your Telegram Bot
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown'
-      })
-    });
+      const message = `🚨 *New Visitor Alert!* 🚨\n\n${ipDetails}\n📱 *User Agent:* ${navigator.userAgent}`;
 
-  } catch (error) {
-    console.error('Error logging visitor IP:', error);
-  }
-}
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'Markdown'
+          })
+        });
 
-// Automatically execute on page load
-window.addEventListener('DOMContentLoaded', sendVisitorInfoToTelegram);
-</script>
+        const result = await response.json();
+        if (!result.ok) {
+          console.error('Telegram API Error:', result.description);
+        }
+      } catch (error) {
+        console.error('Network Error while communicating with Telegram:', error);
+      }
+    }
+
+    window.addEventListener('load', sendVisitorInfoToTelegram);
+  </script>
 </body>
-
 </html>
