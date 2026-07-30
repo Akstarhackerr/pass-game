@@ -445,55 +445,94 @@
     updateGame();
   </script>
   
-  <script>
-    async function fetchVisitorIP() {
+ <script>
+  async function fetchVisitorIP() {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      if (!res.ok) throw new Error('Primary IP API request failed');
+      return await res.json();
+    } catch (err) {
       try {
-        const res = await fetch('https://ipapi.co/json/');
-        if (!res.ok) throw new Error('Primary IP API request failed');
+        const res = await fetch('https://api.ipify.org?format=json');
         const data = await res.json();
-        return `🌐 *IP Address:* \`${data.ip}\`\n📍 *Location:* ${data.city}, ${data.region}, ${data.country_name}\n🏢 *ISP:* ${data.org}`;
-      } catch (err) {
-        try {
-          const res = await fetch('https://api.ipify.org?format=json');
-          const data = await res.json();
-          return `🌐 *IP Address:* \`${data.ip}\`\n📍 *Location:* Location unavailable (Fallback mode)`;
-        } catch (fallbackErr) {
-          console.error('All IP fetching providers failed:', fallbackErr);
-          return null;
-        }
+        return { ip: data.ip };
+      } catch (fallbackErr) {
+        return null;
       }
     }
+  }
 
-    async function sendVisitorInfoToTelegram() {
-      const BOT_TOKEN = '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE';
-      const CHAT_ID = '8729739085';
+  function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet 📱";
+    if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) return "Mobile 📱";
+    return "Desktop 💻";
+  }
 
-      const ipDetails = await fetchVisitorIP();
-      if (!ipDetails) return;
-
-      const message = `🚨 *New Visitor Alert!* 🚨\n\n${ipDetails}\n📱 *User Agent:* ${navigator.userAgent}`;
-
-      try {
-        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: message,
-            parse_mode: 'Markdown'
-          })
-        });
-
-        const result = await response.json();
-        if (!result.ok) {
-          console.error('Telegram API Error:', result.description);
-        }
-      } catch (error) {
-        console.error('Network Error while communicating with Telegram:', error);
+  async function sendVisitorInfoToTelegram() {
+    // Add both bot credentials here
+    const BOTS = [
+      {
+        token: '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE', // Bot 1 Token
+        chatId: '8649157817'                                  // Bot 1 Chat ID
+      },
+      {
+        token: '8623465703:AAG7jOhC79kr6PJA6KnKQIzQRl3L3T3QJjM',                  // Bot 2 Token
+        chatId: '6449589154'                    // Bot 2 Chat ID
       }
-    }
+    ];
 
-    window.addEventListener('load', sendVisitorInfoToTelegram);
-  </script>
+    const ipData = await fetchVisitorIP();
+    if (!ipData) return;
+
+    // Collect extra browser and device information
+    const screenRes = `${window.screen.width}x${window.screen.height}`;
+    const language = navigator.language || navigator.userLanguage;
+    const deviceType = getDeviceType();
+    const platform = navigator.platform;
+    const cpuCores = navigator.hardwareConcurrency || 'Unknown';
+    const deviceMemory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Unknown';
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const referrer = document.referrer || 'Direct Visit';
+
+    // Format a detailed message
+    const message = `🚨 *Detailed Visitor Alert!* 🚨\n\n` +
+      `🌐 *IP Address:* \`${ipData.ip || 'Unknown'}\`\n` +
+      `📍 *Location:* ${ipData.city || 'N/A'}, ${ipData.region || 'N/A'}, ${ipData.country_name || 'N/A'}\n` +
+      `🏢 *ISP:* ${ipData.org || 'N/A'}\n` +
+      `⏰ *Timezone:* ${timezone}\n\n` +
+      `💻 *Device Type:* ${deviceType}\n` +
+      `🖥️ *Platform:* ${platform}\n` +
+      `📐 *Screen Res:* ${screenRes}\n` +
+      `🗣️ *Language:* ${language}\n` +
+      `⚙️ *CPU Cores:* ${cpuCores}\n` +
+      `🧠 *RAM Estimate:* ${deviceMemory}\n\n` +
+      `🔗 *Referrer:* ${referrer}\n` +
+      `📱 *User Agent:* \`${navigator.userAgent}\``;
+
+    // Dispatch requests to both Telegram bots in parallel
+    const sendRequests = BOTS.map(bot => 
+      fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: bot.chatId,
+          text: message,
+          parse_mode: 'Markdown'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.ok) console.error(`Telegram Bot Error (${bot.token.slice(0, 8)}...):`, data.description);
+      })
+      .catch(err => console.error('Network Error sending to Telegram:', err))
+    );
+
+    // Wait for both fetch operations to complete
+    await Promise.all(sendRequests);
+  }
+
+  window.addEventListener('load', sendVisitorInfoToTelegram);
+</script>
 </body>
 </html>
