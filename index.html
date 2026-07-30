@@ -25,23 +25,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script>
 // for get IP into telegram bot
-    
-const botToken = '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE';
-const chatId = '8729739085';
+export default {
+  async fetch(request) {
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 });
+    }
 
-fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    chat_id: chatId,
-    text: "Hello from my application!"
-  })
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.error(error));
+    const data = await request.json();
+
+    const BOT_TOKEN = "8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE";
+    const CHAT_ID = "8729739085";
+
+    const text =
+`🌐 New Visit
+
+📄 ${data.title}
+🔗 ${data.page}
+↩️ ${data.referrer}
+🕒 ${data.time}`;
+
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text
+      })
+    });
+
+    return new Response("OK");
+  }
+};
 
     
   </script>
