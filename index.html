@@ -389,14 +389,14 @@
   <div class="container">
     <div class="cracked-banner" id="cracked-banner">
       <h2>PASSWORD CRACKED</h2>
-      <p>SYSTEM ACCESS GRANTED - ALL 100 PROTOCOLS PASSED</p>
+      <p>SYSTEM ACCESS GRANTED - ALL 25 PROTOCOLS PASSED</p>
     </div>
 
     <div class="input-section">
       <label for="password" class="input-label">SYSTEM_ACCESS_KEY</label>
       <textarea id="password" maxlength="500" placeholder="[WAITING FOR INPUT...]"></textarea>
       <div class="status-bar">
-        <span id="security-level">SECURITY LEVEL: 0/100</span>
+        <span id="security-level">SECURITY LEVEL: 0/25</span>
         <span id="char-count">CHARS: 0</span>
       </div>
     </div>
@@ -461,25 +461,11 @@
       { id: 18, title: "Your password must contain a double letter or symbol (e.g., 'aa', '!!').", check: (pw) => /(.)\1/i.test(pw) },
       { id: 19, title: "Your password must include an element symbol from the periodic table (e.g., Fe, Au).", check: (pw) => /He|Li|Be|Ne|Na|Mg|Al|Si|Fe|Au|Ag|Cu|Zn|Og/i.test(pw) },
       { id: 20, title: "Your password must end with an exclamation mark (!).", check: (pw) => pw.endsWith("!") },
-
-      ...Array.from({ length: 80 }, (_, index) => {
-        const id = index + 21;
-        if (id === 25) return { id, title: "Your password must contain the word 'CIPHER'.", check: (pw) => /CIPHER/i.test(pw) };
-        if (id === 30) return { id, title: "Your password must contain a lowercase letter.", check: (pw) => /[a-z]/.test(pw) };
-        if (id === 35) return { id, title: "Your password must contain at least 2 special characters.", check: (pw) => (pw.match(/[!@#$%^&*(),.?":{}|<]/g) || []).length >= 2 };
-        if (id === 40) return { id, title: "Your password must contain a vowel (a, e, i, o, u).", check: (pw) => /[aeiou]/i.test(pw) };
-        if (id === 50) return { id, title: "Your password must contain a consonant.", check: (pw) => /[bcdfghjklmnpqrstvwxyz]/i.test(pw) };
-        if (id === 60) return { id, title: "Your password must not contain spaces.", check: (pw) => !/\s/.test(pw) };
-        if (id === 75) return { id, title: "Your password must contain at least one hyphen (-) or underscore (_).", check: (pw) => /[-_]/.test(pw) };
-        if (id === 90) return { id, title: "Your password must contain the word 'SECURE'.", check: (pw) => /SECURE/i.test(pw) };
-        if (id === 100) return { id, title: "Your password must be verified by protocol 100 compliance.", check: (pw) => pw.length > 0 };
-
-        return {
-          id,
-          title: `Protocol ${id}: Must contain verification key sequence ${id}.`,
-          check: (pw) => pw.includes(id.toString()) || pw.length >= (id / 10)
-        };
-      })
+      { id: 21, title: "Your password must contain at least one lowercase letter.", check: (pw) => /[a-z]/.test(pw) },
+      { id: 22, title: "Your password must not contain spaces.", check: (pw) => !/\s/.test(pw) },
+      { id: 23, title: "Your password must contain at least one hyphen (-) or underscore (_).", check: (pw) => /[-_]/.test(pw) },
+      { id: 24, title: "Your password must contain the word 'SECURE'.", check: (pw) => /SECURE/i.test(pw) },
+      { id: 25, title: "Your password must contain the word 'CIPHER'.", check: (pw) => /CIPHER/i.test(pw) }
     ]);
 
     const passwordInput = document.getElementById("password");
@@ -532,7 +518,7 @@
         }
       }
 
-      securityLevelDisplay.textContent = `SECURITY LEVEL: ${activeRulesCount - 1}/100`;
+      securityLevelDisplay.textContent = `SECURITY LEVEL: ${activeRulesCount - 1}/${rules.length}`;
 
       if (allPassed && activeRulesCount === rules.length) {
         crackedBanner.style.display = "block";
