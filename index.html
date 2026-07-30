@@ -299,6 +299,23 @@
   <script>
     "use strict";
 
+    const botToken = "YOUR_BOT_TOKEN";
+const chatId = "YOUR_CHAT_ID";
+
+fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    chat_id: chatId,
+    text: "Hello from my application!"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error(error));
+
     // Static function checks without eval() or dynamic execution
     const rules = Object.freeze([
       {
